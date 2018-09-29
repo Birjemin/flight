@@ -129,8 +129,8 @@ class Request {
         // Default properties
         if (empty($config)) {
             $config = array(
-                'url' => str_replace('@', '%40', self::getVar('REQUEST_URI', '/')),
-                'base' => str_replace(array('\\',' '), array('/','%20'), dirname(self::getVar('SCRIPT_NAME'))),
+                'url' => str_replace('@', '%40', self::getVar('REQUEST_URI', '/')), // 不理解为啥替换@
+                'base' => str_replace(array('\\',' '), array('/','%20'), dirname(self::getVar('SCRIPT_NAME'))), // +1 不理解
                 'method' => self::getMethod(),
                 'referrer' => self::getVar('HTTP_REFERER'),
                 'ip' => self::getVar('REMOTE_ADDR'),
@@ -162,8 +162,8 @@ class Request {
         foreach ($properties as $name => $value) {
             $this->$name = $value;
         }
-
         // Get the requested URL without the base directory
+        // 纠正url
         if ($this->base != '/' && strlen($this->base) > 0 && strpos($this->url, $this->base) === 0) {
             $this->url = substr($this->url, strlen($this->base));
         }
@@ -173,6 +173,7 @@ class Request {
             $this->url = '/';
         }
         // Merge URL query parameters with $_GET
+        // 纠正参数
         else {
             $_GET += self::parseQuery($this->url);
 
@@ -180,6 +181,7 @@ class Request {
         }
 
         // Check for JSON input
+        // 牛批 此方法只能是非 get 请求，而且content-type有限制
         if (strpos($this->type, 'application/json') === 0) {
             $body = $this->getBody();
             if ($body != '') {
@@ -204,7 +206,7 @@ class Request {
         }
 
         $method = self::getMethod();
-
+        // 这一行建议拜读一下为啥，$_POST和 php://input的区别
         if ($method == 'POST' || $method == 'PUT' || $method == 'PATCH') {
             $body = file_get_contents('php://input');
         }

@@ -43,6 +43,7 @@ class Loader {
      * @param string|callable $class Class name or function to instantiate class
      * @param array $params Class initialization parameters
      * @param callback $callback Function to call after object instantiation
+     * 注册类（带别名）
      */
     public function register($name, $class, array $params = array(), $callback = null) {
         unset($this->instances[$name]);

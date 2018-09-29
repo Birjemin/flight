@@ -70,6 +70,7 @@ class Route {
      * @param string $url Requested URL
      * @param boolean $case_sensitive Case sensitive matching
      * @return boolean Match status
+     * $url为路由（没有domain域名）
      */
     public function matchUrl($url, $case_sensitive = false) {
         // Wildcard or exact match
@@ -81,20 +82,24 @@ class Route {
         $last_char = substr($this->pattern, -1);
 
         // Get splat
+        // 最后一个字符为 * ，说明是通配符路由
         if ($last_char === '*') {
             $n = 0;
             $len = strlen($url);
             $count = substr_count($this->pattern, '/');
 
             for ($i = 0; $i < $len; $i++) {
+                // 用到了string访问单个字符的方法
                 if ($url[$i] == '/') $n++;
                 if ($n == $count) break;
             }
-
+            // 这个东西有什么用？？？其实看业务，业务如果用到了就有用（手册Route Info章节）
             $this->splat = (string)substr($url, $i+1);
         }
 
+        // 以下代码均为转换正则
         // Build the regex for matching
+        // 转换 ) /*
         $regex = str_replace(array(')','/*'), array(')?','(/?|/.*?)'), $this->pattern);
 
         $regex = preg_replace_callback(
@@ -137,6 +142,9 @@ class Route {
      *
      * @param string $method HTTP method
      * @return bool Match status
+     * $this->methods为传入的route具有的method
+     * array_intersect函数取的是交集（intersection），返回交集数组
+     * 判断数组是否为空，可以使用count计数，也可以转化成bool类型，也可以通过empty判断
      */
     public function matchMethod($method) {
         return count(array_intersect(array($method, '*'), $this->methods)) > 0;

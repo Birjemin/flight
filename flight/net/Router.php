@@ -57,6 +57,7 @@ class Router {
      * @param string $pattern URL pattern to match
      * @param callback $callback Callback function
      * @param boolean $pass_route Pass the matching route object to the callback
+     * 设置routes映射关系，将所有的route全部格式化并且保存在$this->routes中
      */
     public function map($pattern, $callback, $pass_route = false) {
         $url = $pattern;
@@ -76,6 +77,7 @@ class Router {
      *
      * @param Request $request Request object
      * @return Route|bool Matching route or false if no match
+     * 格式化路由uri
      */
     public function route(Request $request) {
         while ($route = $this->current()) {
